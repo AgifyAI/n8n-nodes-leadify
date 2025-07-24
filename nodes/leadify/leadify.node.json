@@ -1,0 +1,21 @@
+{
+	"node": "n8n-nodes-base.leadify",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"CRM",
+		"Marketing"
+	],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://docs.n8n.io/integrations/creating-nodes/build/declarative-style-node/"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://api-leadify.agify.fr/docs"
+			}
+		]
+	}
+}
