@@ -4,7 +4,7 @@ export class Leadify implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Leadify',
 		name: 'leadify',
-		icon: 'file:leadify-logo.png',
+		icon: 'file:leadify-logo.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
