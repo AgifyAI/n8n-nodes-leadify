@@ -1,8 +1,8 @@
 import {
-    IAuthenticateGeneric,
-    ICredentialTestRequest,
-    ICredentialType,
-    INodeProperties,
+	IAuthenticateGeneric,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
 } from 'n8n-workflow';
 
 export class LeadifyApi implements ICredentialType {
@@ -34,7 +34,7 @@ export class LeadifyApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: 'https://api-leadify.agify.fr',
-			url: '/get-leads',
+			url: '/test-api-key',
 			method: 'GET',
 		},
 	};
