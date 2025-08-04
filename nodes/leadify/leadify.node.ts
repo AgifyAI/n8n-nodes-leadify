@@ -47,6 +47,30 @@ export class Leadify implements INodeType {
 						},
 					},
 					{
+						name: 'Delete Columns',
+						value: 'deleteColumns',
+						description: 'Delete multiple columns',
+						action: 'Delete columns',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '/delete-column',
+							},
+						},
+					},
+					{
+						name: 'Delete Leads',
+						value: 'deleteLeads',
+						description: 'Delete multiple leads',
+						action: 'Delete leads',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '/delete-lead',
+							},
+						},
+					},
+					{
 						name: 'Get Leads',
 						value: 'getLeads',
 						description: 'Get leads from a group',
@@ -178,6 +202,50 @@ export class Leadify implements INodeType {
 					request: {
 						body: {
 							updates: '={{JSON.parse($value)}}',
+						},
+					},
+				},
+			},
+
+			// Fields for Delete Leads operation
+			{
+				displayName: 'Lead IDs',
+				name: 'leadIds',
+				type: 'json',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['deleteLeads'],
+					},
+				},
+				default: '["lead_id_1", "lead_id_2"]',
+				description: 'Array of lead IDs to delete',
+				routing: {
+					request: {
+						body: {
+							leadIds: '={{JSON.parse($value)}}',
+						},
+					},
+				},
+			},
+
+			// Fields for Delete Columns operation
+			{
+				displayName: 'Column Names',
+				name: 'columnNames',
+				type: 'json',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['deleteColumns'],
+					},
+				},
+				default: '["column1", "column2"]',
+				description: 'Array of column names to delete',
+				routing: {
+					request: {
+						body: {
+							columnNames: '={{JSON.parse($value)}}',
 						},
 					},
 				},
