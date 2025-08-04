@@ -162,6 +162,66 @@ export class Leadify implements INodeType {
 					},
 				},
 			},
+			{
+				displayName: 'Limit',
+				name: 'limit',
+				type: 'number',
+				typeOptions: {
+					minValue: 1,
+				},
+				displayOptions: {
+					show: {
+						operation: ['getLeads'],
+					},
+				},
+				default: 50,
+				description: 'Max number of results to return',
+				routing: {
+					request: {
+						qs: {
+							limit: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Page',
+				name: 'page',
+				type: 'number',
+				displayOptions: {
+					show: {
+						operation: ['getLeads'],
+					},
+				},
+				default: 1,
+				description: 'Page number to retrieve',
+				routing: {
+					request: {
+						qs: {
+							page: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'No Pagination',
+				name: 'noPagination',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						operation: ['getLeads'],
+					},
+				},
+				default: false,
+				description: 'Whether to disable pagination and return all results',
+				routing: {
+					request: {
+						qs: {
+							noPagination: '={{$value}}',
+						},
+					},
+				},
+			},
 
 			// Fields for Update Lead operation
 			{
