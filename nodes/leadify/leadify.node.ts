@@ -291,6 +291,26 @@ export class Leadify implements INodeType {
 
 			// Fields for Delete Columns operation
 			{
+				displayName: 'Lead Group ID',
+				name: 'leadGroupId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['deleteColumns'],
+					},
+				},
+				default: '',
+				description: 'The ID of the lead group to delete columns from',
+				routing: {
+					request: {
+						body: {
+							leadGroupId: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
 				displayName: 'Column Names',
 				name: 'columnNames',
 				type: 'json',
