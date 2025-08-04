@@ -48,7 +48,7 @@ export class Leadify implements INodeType {
 					},
 					{
 						name: 'Get Leads',
-						value: 'getLeads', 
+						value: 'getLeads',
 						description: 'Get leads from a group',
 						action: 'Get leads',
 						routing: {
@@ -105,7 +105,8 @@ export class Leadify implements INodeType {
 						operation: ['addLeads'],
 					},
 				},
-				default: '[\n  {\n    "Email": "example@example.com",\n    "Name": "John Doe"\n  }\n]',
+				default:
+					'{\n  "isSelectFields": ["selectExample1", "selectExample2"],\n  "leads": [\n    {\n      "Email": "example@example.com",\n      "Name": "John Doe",\n      "selectExample1": "scraped",\n      "tel": "010203943593",\n      "selectExemple2": "yes"\n    },\n    {\n      "Email": "example2@example.com",\n      "Name": "Francois Larive",\n      "selectExample1": "api",\n      "tel": "0876486584",\n      "selectExemple2": "no"\n    }\n  ]\n}',
 				description: 'Array of lead data objects to add',
 				routing: {
 					request: {
@@ -169,8 +170,10 @@ export class Leadify implements INodeType {
 						operation: ['updateLead'],
 					},
 				},
-				default: '[\n  {\n    "propertyName": "Email",\n    "value": "newemail@example.com"\n  }\n]',
-				description: 'Array of update objects with propertyName, value, and optional isSelect fields',
+				default:
+					'[\n  {\n    "propertyName": "Email",\n    "value": "newemail@example.com"\n  }\n]',
+				description:
+					'Array of update objects with propertyName, value, and optional isSelect fields',
 				routing: {
 					request: {
 						body: {
