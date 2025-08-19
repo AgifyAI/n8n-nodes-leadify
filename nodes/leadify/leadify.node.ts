@@ -83,6 +83,18 @@ export class Leadify implements INodeType {
 						},
 					},
 					{
+						name: 'Update Hidden Columns',
+						value: 'updateHiddenColumns',
+						description: 'Add or remove hidden columns for a lead group',
+						action: 'Update hidden columns',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '/update-hidden-columns',
+							},
+						},
+					},
+					{
 						name: 'Update Lead',
 						value: 'updateLead',
 						description: 'Update an existing lead',
@@ -326,6 +338,66 @@ export class Leadify implements INodeType {
 					request: {
 						body: {
 							columnNames: '={{JSON.parse($value)}}',
+						},
+					},
+				},
+			},
+
+			// Fields for Update Hidden Columns operation
+			{
+				displayName: 'Lead Group ID',
+				name: 'leadGroupId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['updateHiddenColumns'],
+					},
+				},
+				default: '',
+				description: 'The ID of the lead group to update hidden columns for',
+				routing: {
+					request: {
+						body: {
+							leadGroupId: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Add Hidden Columns',
+				name: 'addHiddenColumns',
+				type: 'json',
+				displayOptions: {
+					show: {
+						operation: ['updateHiddenColumns'],
+					},
+				},
+				default: '["status"]',
+				description: 'Array of column names to add to the hidden list',
+				routing: {
+					request: {
+						body: {
+							addHiddenColumns: '={{JSON.parse($value)}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Remove Hidden Columns',
+				name: 'removeHiddenColumns',
+				type: 'json',
+				displayOptions: {
+					show: {
+						operation: ['updateHiddenColumns'],
+					},
+				},
+				default: '["phone"]',
+				description: 'Array of column names to remove from the hidden list',
+				routing: {
+					request: {
+						body: {
+							removeHiddenColumns: '={{JSON.parse($value)}}',
 						},
 					},
 				},
