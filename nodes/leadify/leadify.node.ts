@@ -42,7 +42,7 @@ export class Leadify implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								url: '/lead-log',
+								url: '/add-lead-log',
 							},
 						},
 					},
@@ -78,7 +78,7 @@ export class Leadify implements INodeType {
 						routing: {
 							request: {
 								method: 'DELETE',
-								url: '/lead-log',
+								url: '/delete-lead-log',
 							},
 						},
 					},
@@ -114,7 +114,7 @@ export class Leadify implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '/lead-logs',
+								url: '/get-lead-logs',
 							},
 						},
 					},
