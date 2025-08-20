@@ -71,6 +71,18 @@ export class Leadify implements INodeType {
 						},
 					},
 					{
+						name: 'Get Lead',
+						value: 'getLead',
+						description: 'Get a single lead by ID',
+						action: 'Get a lead',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/get-lead',
+							},
+						},
+					},
+					{
 						name: 'Get Leads',
 						value: 'getLeads',
 						description: 'Get leads from a group',
@@ -230,6 +242,28 @@ export class Leadify implements INodeType {
 					request: {
 						qs: {
 							noPagination: '={{$value}}',
+						},
+					},
+				},
+			},
+
+			// Fields for Get Lead operation
+			{
+				displayName: 'Lead ID',
+				name: 'leadId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['getLead'],
+					},
+				},
+				default: '',
+				description: 'The ID of the lead to retrieve',
+				routing: {
+					request: {
+						qs: {
+							id: '={{$value}}',
 						},
 					},
 				},
