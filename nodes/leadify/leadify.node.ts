@@ -35,6 +35,18 @@ export class Leadify implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Add Lead Log',
+						value: 'addLeadLog',
+						description: 'Add a log entry related to a lead',
+						action: 'Add lead log',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '/lead-log',
+							},
+						},
+					},
+					{
 						name: 'Add Leads',
 						value: 'addLeads',
 						description: 'Add new leads to a group',
@@ -59,6 +71,18 @@ export class Leadify implements INodeType {
 						},
 					},
 					{
+						name: 'Delete Lead Log',
+						value: 'deleteLeadLog',
+						description: 'Delete a lead log by ID',
+						action: 'Delete lead log',
+						routing: {
+							request: {
+								method: 'DELETE',
+								url: '/lead-log',
+							},
+						},
+					},
+					{
 						name: 'Delete Leads',
 						value: 'deleteLeads',
 						description: 'Delete multiple leads',
@@ -79,6 +103,18 @@ export class Leadify implements INodeType {
 							request: {
 								method: 'GET',
 								url: '/get-lead',
+							},
+						},
+					},
+					{
+						name: 'Get Lead Logs',
+						value: 'getLeadLogs',
+						description: 'Get lead logs with optional filters and pagination',
+						action: 'Get lead logs',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/lead-logs',
 							},
 						},
 					},
@@ -186,6 +222,47 @@ export class Leadify implements INodeType {
 					},
 				},
 			},
+
+			// Fields for Add Lead Log operation
+			{
+				displayName: 'Log Data',
+				name: 'logData',
+				type: 'json',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['addLeadLog'],
+					},
+				},
+				default:
+					'{\n  "campaignSlug": "summer-2024-campaign",\n  "leadId": "your-lead-id-here",\n  "action": "email_sent",\n  "message": "Welcome email sent successfully",\n  "executionId": 12345,\n  "workflowId": 67890,\n  "workflow": "Lead Nurturing Workflow",\n  "workflowUrl": "https://n8n.example.com/workflow/67890",\n  "executionUrl": "https://n8n.example.com/execution/12345",\n  "level": "INFO",\n  "errorCode": null,\n  "retryCount": 0\n}',
+				description: 'JSON payload describing the lead log to create',
+				routing: {
+					request: {
+						body: '={{JSON.parse($value)}}',
+					},
+				},
+			},
+
+			// Fields for Delete Lead Log operation
+			{
+				displayName: 'Delete Log Data',
+				name: 'deleteLogData',
+				type: 'json',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['deleteLeadLog'],
+					},
+				},
+				default: '{\n  "id": "your-lead-log-id-here"\n}',
+				description: 'JSON payload containing the ID of the lead log to delete',
+				routing: {
+					request: {
+						body: '={{JSON.parse($value)}}',
+					},
+				},
+			},
 			{
 				displayName: 'Limit',
 				name: 'limit',
@@ -264,6 +341,205 @@ export class Leadify implements INodeType {
 					request: {
 						qs: {
 							id: '={{$value}}',
+						},
+					},
+				},
+			},
+
+			// Fields for Get Lead Logs operation
+			{
+				displayName: 'Campaign Slug',
+				name: 'campaignSlug',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				default: '',
+				description: 'Filter logs by campaign slug',
+				routing: {
+					request: {
+						qs: {
+							campaign_slug: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Lead ID',
+				name: 'leadId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				default: '',
+				description: 'Filter logs by lead ID',
+				routing: {
+					request: {
+						qs: {
+							lead_id: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Lead Group ID',
+				name: 'leadGroupId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				default: '',
+				description: 'Filter logs by lead group ID',
+				routing: {
+					request: {
+						qs: {
+							leadgroup_id: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Level',
+				name: 'level',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				default: '',
+				description: 'Filter by level, e.g. INFO, WARN, ERROR, DEBUG',
+				routing: {
+					request: {
+						qs: {
+							level: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Date From',
+				name: 'dateFrom',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				default: '',
+				description: 'Filter logs created on or after this date (YYYY-MM-DD)',
+				routing: {
+					request: {
+						qs: {
+							date_from: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Date To',
+				name: 'dateTo',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				default: '',
+				description: 'Filter logs created on or before this date (YYYY-MM-DD)',
+				routing: {
+					request: {
+						qs: {
+							date_to: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Page',
+				name: 'logsPage',
+				type: 'number',
+				default: 1,
+				description: 'Page number to retrieve',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				routing: {
+					request: {
+						qs: {
+							page: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Limit',
+				name: 'logsLimit',
+				type: 'number',
+				typeOptions: {
+					minValue: 1,
+				},
+				default: 20,
+				description: 'Max number of results to return',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				routing: {
+					request: {
+						qs: {
+							limit: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Sort By',
+				name: 'sortBy',
+				type: 'string',
+				default: 'createdAt',
+				description: 'Field to sort by, e.g. createdAt',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				routing: {
+					request: {
+						qs: {
+							sort_by: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Sort Order',
+				name: 'sortOrder',
+				type: 'options',
+				options: [
+					{ name: 'Ascending', value: 'asc' },
+					{ name: 'Descending', value: 'desc' },
+				],
+				default: 'desc',
+				description: 'Sort direction',
+				displayOptions: {
+					show: {
+						operation: ['getLeadLogs'],
+					},
+				},
+				routing: {
+					request: {
+						qs: {
+							sort_order: '={{$value}}',
 						},
 					},
 				},
@@ -457,6 +733,3 @@ export class Leadify implements INodeType {
 		],
 	};
 }
-
-
-
