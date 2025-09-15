@@ -896,7 +896,7 @@ export class Leadify implements INodeType {
 			const options: IHttpRequestOptions = {
 				method: 'GET',
 				url: '/get-leads',
-				qs,
+				// qs,
 				headers: {
 					'Authorization': `Bearer ${credentials.apiKey}`,
 					'Accept': 'application/json',
