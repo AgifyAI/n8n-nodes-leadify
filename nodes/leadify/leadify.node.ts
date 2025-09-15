@@ -1,4 +1,11 @@
-import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
+import {
+	INodeType,
+	INodeTypeDescription,
+	NodeConnectionType,
+	IExecuteFunctions,
+	INodeExecutionData,
+	IHttpRequestOptions,
+} from 'n8n-workflow';
 
 export class Leadify implements INodeType {
 	description: INodeTypeDescription = {
@@ -123,12 +130,6 @@ export class Leadify implements INodeType {
 						value: 'getLeads',
 						description: 'Get leads from a group',
 						action: 'Get leads',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '/get-leads',
-							},
-						},
 					},
 					{
 						name: 'Update Hidden Columns',
@@ -214,13 +215,6 @@ export class Leadify implements INodeType {
 				},
 				default: '',
 				description: 'The ID of the group to get leads from',
-				routing: {
-					request: {
-						qs: {
-							groupId: '={{$value}}',
-						},
-					},
-				},
 			},
 
 			// Fields for Add Lead Log operation
@@ -277,13 +271,6 @@ export class Leadify implements INodeType {
 				},
 				default: 50,
 				description: 'Max number of results to return',
-				routing: {
-					request: {
-						qs: {
-							limit: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Page',
@@ -296,13 +283,6 @@ export class Leadify implements INodeType {
 				},
 				default: 1,
 				description: 'Page number to retrieve',
-				routing: {
-					request: {
-						qs: {
-							page: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'No Pagination',
@@ -315,13 +295,142 @@ export class Leadify implements INodeType {
 				},
 				default: false,
 				description: 'Whether to disable pagination and return all results',
-				routing: {
-					request: {
-						qs: {
-							noPagination: '={{$value}}',
-						},
+			},
+
+			// Dynamic Filters for Get Leads operation
+			{
+				displayName: 'Filters',
+				name: 'filtersCollection',
+				placeholder: 'Add Filter',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				displayOptions: {
+					show: {
+						operation: ['getLeads'],
 					},
 				},
+				default: {},
+				description: 'Add filters to refine your lead search',
+				options: [
+					{
+						name: 'filterItems',
+						displayName: 'Filter',
+						values: [
+							{
+								displayName: 'Field Name',
+								name: 'fieldName',
+								type: 'string',
+								default: '',
+								placeholder: 'e.g. email, company, status',
+								description: 'The name of the field to filter on',
+								required: true,
+							},
+							{
+								displayName: 'Operator',
+								name: 'operator',
+								type: 'options',
+								options: [
+									{
+										name: 'Contains',
+										value: 'contains', 
+										description: 'Contains the text',
+									},
+									{
+										name: 'Equals',
+										value: 'equals',
+										description: 'Exact match',
+									},
+									{
+										name: 'Greater Than or Equal',
+										value: 'gte',
+										description: 'Greater than or equal to (for numbers/dates)',
+									},
+									{
+										name: 'Is False',
+										value: 'is_false',
+										description: 'Boolean value is false',
+									},
+									{
+										name: 'Is Not Null',
+										value: 'is_not_null',
+										description: 'Field has a value',
+									},
+									{
+										name: 'Is Null',
+										value: 'is_null',
+										description: 'Field is empty or null',
+									},
+									{
+										name: 'Is True',
+										value: 'is_true',
+										description: 'Boolean value is true',
+									},
+									{
+										name: 'Less Than or Equal',
+										value: 'lte',
+										description: 'Less than or equal to (for numbers/dates)',
+									},
+									{
+										name: 'Not Contains',
+										value: 'not_contains',
+										description: 'Does not contain the text',
+									},
+									{
+										name: 'Not Equals',
+										value: 'not_equals',
+										description: 'Does not equal',
+									},
+								],
+								default: 'equals',
+								description: 'The comparison operator to use',
+								required: true,
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								placeholder: 'Filter value',
+								description: 'The value to compare against (leave empty for is_null, is_not_null, is_true, is_false)',
+								displayOptions: {
+									hide: {
+										operator: ['is_null', 'is_not_null', 'is_true', 'is_false'],
+									},
+								},
+							},
+						],
+					},
+				],
+			},
+
+			// Search parameter for Get Leads operation
+			{
+				displayName: 'Search',
+				name: 'search',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeads'],
+					},
+				},
+				default: '',
+				description: 'Global text search across all fields',
+			},
+
+			// View ID parameter for Get Leads operation
+			{
+				displayName: 'View ID',
+				name: 'viewId',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['getLeads'],
+					},
+				},
+				default: '',
+				description: 'ID of an existing view to combine with URL filters',
 			},
 
 			// Fields for Get Lead operation
@@ -732,4 +841,77 @@ export class Leadify implements INodeType {
 			},
 		],
 	};
+
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		const items = this.getInputData();
+		const operation = this.getNodeParameter('operation', 0) as string;
+		
+		// Only handle getLeads operation with custom filter logic
+		if (operation === 'getLeads') {
+			const credentials = await this.getCredentials('leadifyApi');
+			const groupId = this.getNodeParameter('groupId', 0) as string;
+			const limit = this.getNodeParameter('limit', 0) as number;
+			const page = this.getNodeParameter('page', 0) as number;
+			const noPagination = this.getNodeParameter('noPagination', 0) as boolean;
+			const search = this.getNodeParameter('search', 0) as string;
+			const viewId = this.getNodeParameter('viewId', 0) as string;
+			const filtersCollection = this.getNodeParameter('filtersCollection', 0) as any;
+
+			// Build query parameters
+			const qs: any = {
+				groupId,
+				limit,
+				page,
+				noPagination,
+			};
+
+			// Add search if provided
+			if (search) {
+				qs.search = search;
+			}
+
+			// Add viewId if provided
+			if (viewId) {
+				qs.viewId = viewId;
+			}
+
+			// Process dynamic filters
+			if (filtersCollection?.filterItems) {
+				const filters = filtersCollection.filterItems;
+				filters.forEach((filter: any) => {
+					if (filter.fieldName && filter.operator) {
+						const key = `filter[${filter.fieldName}][${filter.operator}]`;
+						
+						// For operators that don't need a value, set to "true"
+						if (['is_null', 'is_not_null', 'is_true', 'is_false'].includes(filter.operator)) {
+							qs[key] = 'true';
+						} else if (filter.value !== undefined && filter.value !== '') {
+							qs[key] = filter.value;
+						}
+					}
+				});
+			}
+
+			// Make the HTTP request
+			const options: IHttpRequestOptions = {
+				method: 'GET',
+				url: '/get-leads',
+				qs,
+				headers: {
+					'Authorization': `Bearer ${credentials.apiKey}`,
+					'Accept': 'application/json',
+					'Content-Type': 'application/json',
+				},
+				json: true,
+			};
+
+			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'leadifyApi', options);
+			
+			return [this.helpers.returnJsonArray(response)];
+		}
+
+		// For all other operations, use the default declarative routing
+		// This will never be reached due to n8n's routing system, but kept for completeness
+		return [items];
+	}
 }
