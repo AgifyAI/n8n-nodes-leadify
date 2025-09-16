@@ -1,10 +1,10 @@
 import {
-	INodeType,
-	INodeTypeDescription,
-	NodeConnectionType,
-	IExecuteFunctions,
-	INodeExecutionData,
-	IHttpRequestOptions,
+    INodeType,
+    INodeTypeDescription,
+    NodeConnectionType,
+    IExecuteFunctions,
+    INodeExecutionData,
+    IHttpRequestOptions,
 } from 'n8n-workflow';
 
 export class Leadify implements INodeType {
@@ -892,11 +892,11 @@ export class Leadify implements INodeType {
                 });
             }
 
-            // Make the HTTP request
+            // Make the HTTP request using n8n's request helper
             const options: IHttpRequestOptions = {
                 method: 'GET',
-                url: '/get-leads',
-                // qs,
+                url: 'https://api-leadify.agify.fr/get-leads',
+                qs,
                 headers: {
                     'Authorization': `Bearer ${credentials.apiKey}`,
                     'Accept': 'application/json',
@@ -905,7 +905,7 @@ export class Leadify implements INodeType {
                 json: true,
             };
 
-            const response = await this.helpers.httpRequestWithAuthentication.call(this, 'leadifyApi', options);
+            const response = await this.helpers.httpRequest(options);
             
             return [this.helpers.returnJsonArray(response)];
         }
